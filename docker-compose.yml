@@ -1,0 +1,28 @@
+services:
+  bot:
+    build: .
+    container_name: duckbot_app
+    env_file: .env
+    restart: unless-stopped
+    volumes: ["./data:/app/data", "./logs:/app/logs"]
+    command: python bot_wrapper.py
+  exporter:
+    build: .
+    container_name: duckbot_exporter
+    command: python -m duckbot.exporter
+    env_file: .env
+    ports: ["9100:9100"]
+    volumes: ["./data:/app/data"]
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:latest
+    ports: ["9090:9090"]
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml"]
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["3000:3000"]
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    restart: unless-stopped

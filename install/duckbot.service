@@ -1,0 +1,15 @@
+[Unit]
+Description=Crypto Duck Bot (dry-run trading cycle loop)
+After=network-online.target
+
+[Service]
+Type=simple
+User=duckbot
+WorkingDirectory=/opt/crypto-duck-bot
+EnvironmentFile=/opt/crypto-duck-bot/.env
+ExecStart=/opt/crypto-duck-bot/.venv/bin/python bot_wrapper.py
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

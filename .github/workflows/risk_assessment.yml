@@ -1,0 +1,39 @@
+name: Risk Assessment
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+concurrency:
+  group: risk-assessment
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  risk-profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - run: make fetch-history
+      - run: make backtest
+      - run: python3 -m duckbot.monte_carlo --no-plot
+      - run: python3 risk_drift.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: risk-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 90
+      - name: Commit drift history
+        run: |
+          git config user.name "duck-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git add risk_history/risk_drift.csv
+          git diff --cached --quiet || git commit -m "data: weekly risk drift snapshot"
+          git push
