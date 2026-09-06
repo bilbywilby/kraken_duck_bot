@@ -19,7 +19,7 @@ def main():
     candles, prev = [], object()
     while cursor < now_ms and cursor != prev:
         prev = cursor
-        batch = ex.fetch_ohlcv("BTC/USD", timeframe="1h", since=cursor, limit=PER_REQUEST)
+        batch = ex.fetch_ohlcv("BTC/USD", timeframe="1d", since=cursor, limit=PER_REQUEST)
         if not batch:
             break
         candles.extend(batch)
