@@ -10,6 +10,7 @@ def derive_round_trips(df, cfg, slippage):
     local = df["timestamp"].dt.tz_convert(cfg.timezone)
     df = df.assign(local_dt=local, local_t=local.dt.strftime("%H:%M"))
     buys = df[(df.local_t >= cfg.buy_window[0]) & (df.local_t < cfg.buy_window[1])]
+    buys = buys.groupby(buys.local_dt.dt.date, as_index=False).first()  # ONE entry per day
     sells = df[(df.local_t >= cfg.sell_window[0]) & (df.local_t < cfg.sell_window[1])]
     rows = []
     for _, b in buys.iterrows():

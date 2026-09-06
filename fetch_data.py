@@ -4,7 +4,7 @@ import argparse, csv, os, time
 from datetime import datetime, timedelta, timezone
 import ccxt
 
-PAIR, TIMEFRAME, PER_REQUEST = "BTC/USD", "1h", 720
+PAIR, TIMEFRAME, PER_REQUEST = "BTC/USD", "1d", 720
 
 def main():
     ap = argparse.ArgumentParser()
